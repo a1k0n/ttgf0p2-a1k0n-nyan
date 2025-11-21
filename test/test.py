@@ -10,7 +10,7 @@ from cocotb.triggers import ClockCycles
 async def test_project(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 39, units="ns")
+    clock = Clock(dut.clk, 39, unit="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -36,13 +36,16 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 640+48+16+96)
 
     # hsync and vsync should be de-asserted (high)
-    assert dut.uo_out[3].value == 1
-    assert dut.uo_out[7].value == 1
+    v = dut.uo_out.value
+    assert v[3] == 1
+    assert v[7] == 1
 
     # hsync should go low after the front porch
     await ClockCycles(dut.clk, 640+16+2)
-    assert dut.uo_out[7].value == 0
+    v = dut.uo_out.value
+    assert v[7] == 0
 
     # and high again
     await ClockCycles(dut.clk, 96)
-    assert dut.uo_out[7].value == 1
+    v = dut.uo_out.value
+    assert v[7] == 1
